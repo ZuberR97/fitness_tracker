@@ -13,6 +13,8 @@
             <button><a href="table">Fitness History Table</a></button>
             <button><a href="/">Home</a></button>
         </div>
+        <!-- initialize string variables to hold all values as strings
+        then for each record concatinate the values to their corresponding variable to be used in the script tag -->
         <% var dates = ''; %>
         <% var walkingTimes = ''; %>
         <% var pushupNums = ''; %>
@@ -28,6 +30,9 @@
         <div class="chartDiv"><canvas id="chartDiv"></canvas></div>
     </body>
     <script>
+        //initial var takes full string of each value of that type: datesVar takes all dates and puts them in one string etc.
+        //next var splits each individual value into its own string, creating an array
+        //var 3 is then declared and uses all values of the previous var as numbers instead of strings so chart.js will use them
         var datesVar = '<%= dates.trim() %>';
         var datesStrArr = datesVar.split(' ');
         var dates = [];
@@ -87,16 +92,7 @@
                 title: {
                 display: true,
                 text: 'Workout Data'
-                }//, scales: {
-                //     xAxes: [{
-                //         type: 'time',
-                //         time: {
-                //             displayFormats: {
-                //                 week: 'll'
-                //             }
-                //         }
-                //     }]
-                // }
+                }
             }
         });
     </script>

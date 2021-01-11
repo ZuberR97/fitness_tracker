@@ -1,0 +1,50 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+h1 {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    /* margin-top: 7px; */
+}
+
+input {
+    display: block;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+button {
+    display: inline block;
+    margin: auto;
+    width: 150px;
+}
+
+table {
+    border-collapse: collapse;
+    border: solid 2px black;
+    /* margin-top: 30px; */
+    margin: auto;
+}
+
+th, td {
+    border: solid 2px black;
+    border-width: 0px 2px 2px 2px;
+    text-align: center;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+.buttonDiv {
+    text-align: center;
+}
+
+.chartDiv {
+    width: 1200px;
+    height: 700px;
+    margin: auto;
+}

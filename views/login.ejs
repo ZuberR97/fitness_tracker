@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="beautify.css">
+        <title>Fitness Tracker</title>
+        <base href="/">
+    </head>
+    <body>
+        <h1>Welcome to your Personal Fitness Tracker</h1>
+        <div class="logRegOverbox">
+            <div class="logRegBox">
+                <h1>Login</h1>
+                <form action="/loggingIn" method="POST">
+                    <p>Username: </p>
+                    <input type="text">
+                    <p>Password: </p>
+                    <input type="password">
+                </form>
+            </div>
+            <div class="logRegBox">
+                <h1>Registration</h1>
+                <form action="/registering" method="POST">
+                    <p>Username: </p>
+                    <input type="text">
+                    <p>Password: </p>
+                    <input type="password">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

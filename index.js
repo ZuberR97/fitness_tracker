@@ -34,6 +34,9 @@ app.get('/table', function (req, res) {
 app.get('/chart', function (req, res) {
     res.render("chart", { fitnessRecords: records });
 });
+app.get('/login', function (req, res) {
+    res.render("login");
+});
 app.post('/results', function (req, res) {
     var date = new Date();
     var sqlReq = `INSERT INTO fitnesstracker (created_at, walking_minutes, pushups, plank_seconds) 

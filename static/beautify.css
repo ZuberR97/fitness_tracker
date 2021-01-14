@@ -54,3 +54,14 @@ th, td {
     height: 700px;
     margin: auto;
 }
+
+.logRegBox {
+    display: inline-block;
+    margin: auto;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.logRegOverbox {
+    text-align: center;
+}

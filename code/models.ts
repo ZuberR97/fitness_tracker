@@ -19,7 +19,7 @@ export class fitRec {
 export class ftuser {
     public id: number;
     public username: string; //username will need to be unique
-    private password: string; //password needs to be hashed
+    public password: string; //password needs to be hashed
     public created_at: Date;
     public updated_at: Date;
 

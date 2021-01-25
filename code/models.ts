@@ -15,3 +15,19 @@ export class fitRec {
     }
 }
 //add validations
+
+export class ftuser {
+    public id: number;
+    public username: string; //username will need to be unique
+    public password: string; //password needs to be hashed
+    public created_at: Date;
+    public updated_at: Date;
+
+    constructor(id: number, username: string, password: string, created_at: Date, updated_at: Date) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
+    }
+}

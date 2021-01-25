@@ -5,13 +5,15 @@
         <link rel="stylesheet" href="beautify.css">
         <title>Fitness Tracker</title>
         <base href="/">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     </head>
     <body>
         <h1>Fitness History Table</h1>
         <div class="buttonDiv">
             <button><a href="/">Home</a></button>
             <button><a href="chart">Fitness History Chart</a></button>
+            <form action="/logout" method="POST">
+                <button class="buttonDiv">Logout</button>
+            </form>
         </div>
         <table>
             <tr>

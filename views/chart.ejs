@@ -10,8 +10,11 @@
     <body>
         <h1>Fitness History Chart</h1>
         <div class="buttonDiv">
-            <button><a href="table">Fitness History Table</a></button>
             <button><a href="/">Home</a></button>
+            <button><a href="table">Fitness History Table</a></button>
+            <form action="/logout" method="POST">
+                <button class="buttonDiv">Logout</button>
+            </form>
         </div>
         <!-- initialize string variables to hold all values as strings
         then for each record concatinate the values to their corresponding variable to be used in the script tag -->

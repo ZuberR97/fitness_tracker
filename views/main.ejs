@@ -5,10 +5,18 @@
         <link rel="stylesheet" href="beautify.css">
         <title>Fitness Tracker</title>
         <base href="/">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     </head>
     <body>
         <h1>Personal Fitness Tracker</h1>
+
+        <div class="buttonDiv">
+            <button><a href="table">Fitness History Table</a></button>
+            <button><a href="chart">Fitness History Chart</a></button>
+            <form action="/logout" method="POST">
+                <button class="buttonDiv">Logout</button>
+            </form>
+        </div>
+        
         <form action="/results" method="POST">
             <p>Walking minutes: </p>
             <input type="number" name="walking_minutes">
@@ -18,110 +26,5 @@
             <input type="number" name="plank_seconds">
             <input type="submit">
         </form>
-
-        <div class="buttonDiv">
-            <button><a href="table">Fitness History Table</a></button>
-            <button><a href="chart">Fitness History Chart</a></button>
-        </div>
-        <!-- <% var dates = ''; %>
-        <% var walkingTimes = ''; %>
-        <% var pushupNums = ''; %>
-        <% var plankTimes = ''; %>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Minutes Walked</th>
-                <th>Pushups</th>
-                <th>Seconds Planked</th>
-            </tr>
-            <% var increment = 0; %>
-            <% for(i in fitnessRecords) { %>
-                <% var tempDate = `${fitnessRecords[i].created_at.toString().substring(8, 10)}${fitnessRecords[i].created_at.toString().substring(11, 15)}`%>
-                <% dates += `${tempDate} `; %>
-                <% walkingTimes += `${fitnessRecords[i].walking_minutes} `; %>
-                <% pushupNums += `${fitnessRecords[i].pushups} `; %>
-                <% plankTimes += `${fitnessRecords[i].plank_seconds} `; %>
-                <tr>
-                    <td><%= fitnessRecords[i].created_at.toString().substring(0, 15) %></td>
-                    <td><%= fitnessRecords[i].walking_minutes %></td>
-                    <td><%= fitnessRecords[i].pushups %></td>
-                    <td><%= fitnessRecords[i].plank_seconds %></td>
-                </tr>
-            <% } %>
-        </table>
-        <div class="chartDiv"><canvas id="chartDiv"></canvas></div> -->
     </body>
-    <!-- <script>
-        var datesVar = '<%= dates.trim() %>';
-        var datesStrArr = datesVar.split(' ');
-        var dates = [];
-        for(var i = 0; i < datesStrArr.length; i++) {
-            var date = +datesStrArr[i];
-            dates.push(date);
-        }
-
-        var walkingTimesVar = '<%= walkingTimes.trim() %>';
-        var walkingTimesStrArr = walkingTimesVar.split(' ');
-        var walkingTimes = [];
-        for(var i = 0; i < walkingTimesStrArr.length; i++) {
-            var time = +walkingTimesStrArr[i];
-            walkingTimes.push(time);
-        }
-
-        var pushupNumsVar = '<%= pushupNums.trim() %>';
-        var pushupNumsStrArr = pushupNumsVar.split(' ');
-        var pushupNums = [];
-        for(var i = 0; i < pushupNumsStrArr.length; i++) {
-            var num = +pushupNumsStrArr[i];
-            pushupNums.push(num);
-        }
-
-        var plankTimesVar = '<%= plankTimes.trim() %>';
-        var plankTimesStrArr = plankTimesVar.split(' ');
-        var plankTimes = [];
-        for(var i = 0; i < plankTimesStrArr.length; i++) {
-            var time = +plankTimesStrArr[i];
-            plankTimes.push(time);
-        }
-
-        var ctx = document.getElementById('chartDiv').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{ 
-                    data: walkingTimes,
-                    label: "Walking Minutes",
-                    borderColor: "#3e95cd",
-                    fill: false
-                }, { 
-                    data: pushupNums,
-                    label: "Pushups",
-                    borderColor: "#8e5ea2",
-                    fill: false
-                }, { 
-                    data: plankTimes,
-                    label: "Planking Seconds",
-                    borderColor: "#3cba9f",
-                    fill: false
-                }
-                ]
-            },
-            options: {
-                title: {
-                display: true,
-                text: 'Workout Data'
-                }//, scales: {
-                //     xAxes: [{
-                //         type: 'time',
-                //         time: {
-                //             displayFormats: {
-                //                 week: 'll'
-                //             }
-                //         }
-                //     }]
-                // }
-            }
-        });
-    </script> -->
 </html>

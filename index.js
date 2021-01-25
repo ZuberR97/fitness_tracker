@@ -22,6 +22,7 @@ app.use(session({
     secret: "secretString",
     resave: true,
     saveUninitialized: true
+    // cookie: { maxAge: 60000 }
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/static"));
@@ -39,16 +40,36 @@ con.connect(function (err) {
 });
 // }
 app.get('/', function (req, res) {
-    res.render("main", { fitnessRecords: records });
+    if (req.session.loggedIn) {
+        res.render("main", { fitnessRecords: records });
+    }
+    else {
+        res.redirect("/login");
+    }
 });
 app.get('/table', function (req, res) {
-    res.render("table", { fitnessRecords: records });
+    if (req.session.loggedIn) {
+        res.render("table", { fitnessRecords: records });
+    }
+    else {
+        res.redirect("/login");
+    }
 });
 app.get('/chart', function (req, res) {
-    res.render("chart", { fitnessRecords: records });
+    if (req.session.loggedIn) {
+        res.render("chart", { fitnessRecords: records });
+    }
+    else {
+        res.redirect("/login");
+    }
 });
 app.get('/login', function (req, res) {
     res.render("login");
+});
+app.post('/logout', function (req, res) {
+    req.session.loggedIn = false;
+    req.session.user = '';
+    res.redirect('/login');
 });
 app.post('/results', function (req, res) {
     var date = new Date();
@@ -59,12 +80,11 @@ app.post('/results', function (req, res) {
         if (err) {
             throw err;
         }
-        ;
         console.log("New workout added");
     });
     res.redirect('/');
 });
-app.post('/registering', function (req, res) {
+app.post('/registering', async function (req, res) {
     var date = new Date();
     var encryptedPW = passwordHash.generate(`${req.body.password}`);
     var sqlReq = `INSERT INTO ftusers (username, password, created_at, updated_at)
@@ -78,20 +98,11 @@ app.post('/registering', function (req, res) {
         ;
         console.log(`${req.body.username} has been welcomed to the site`);
     });
+    var loggedUser = await getResult(req.body.username);
+    req.session.loggedIn = true;
+    req.session.user = loggedUser[0].id.toString();
     res.redirect('/');
 });
-// async function getUser(username: string): Promise<string> {
-//     var sqlReq = `SELECT * FROM ftusers WHERE username = '${username}' LIMIT 1`;
-//     var loggedUserPW = '';
-//     await con.query(sqlReq, function(err:Error, result: any): string {
-//         if(err) {
-//             throw err
-//         };
-//         console.log(result[0].username);
-//         return result[0].password;
-//     });
-//     return loggedUserPW;
-// }
 function dbQuery(databaseQuery) {
     return new Promise(data => {
         con.query(databaseQuery, function (err, result) {
@@ -119,9 +130,11 @@ async function getResult(username) {
 }
 app.post('/loggingIn', async function (req, res) {
     try {
-        var loggedUserPW = await getResult(req.body.username);
-        if (passwordHash.verify(req.body.password, loggedUserPW[0].password)) {
+        var loggedUser = await getResult(req.body.username);
+        if (passwordHash.verify(req.body.password, loggedUser[0].password)) {
             console.log(`${req.body.username} logged in`);
+            req.session.loggedIn = true;
+            req.session.user = loggedUser[0].id.toString();
             res.redirect('/');
         }
         else {

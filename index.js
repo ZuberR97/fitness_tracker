@@ -5,6 +5,7 @@ const express = require('express');
 const session = require('express-session');
 const passwordHash = require('password-hash');
 const cookieParser = require('cookie-parser');
+const { body, validationResult } = require('express-validator');
 const uuid = require('crypto').randomBytes(48).toString('hex');
 const app = express();
 const port = 3000;
@@ -17,30 +18,27 @@ var con = sql.createConnection({
     password: "root",
     database: "mydb"
 });
+app.use(express.json());
 app.use(cookieParser());
 app.use(session({
     secret: "secretString",
     resave: true,
     saveUninitialized: true
-    // cookie: { maxAge: 60000 }
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/static"));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-// function getRecords() {
-con.connect(function (err) {
-    if (err)
-        console.log(err);
+function getRecords() {
     con.query(`select * from fitnesstracker`, function (err, recordset) {
         if (err)
             console.log(err);
         records = recordset;
     });
-});
-// }
+}
 app.get('/', function (req, res) {
     if (req.session.loggedIn) {
+        getRecords();
         res.render("main", { fitnessRecords: records });
     }
     else {
@@ -49,6 +47,7 @@ app.get('/', function (req, res) {
 });
 app.get('/table', function (req, res) {
     if (req.session.loggedIn) {
+        getRecords();
         res.render("table", { fitnessRecords: records });
     }
     else {
@@ -57,6 +56,7 @@ app.get('/table', function (req, res) {
 });
 app.get('/chart', function (req, res) {
     if (req.session.loggedIn) {
+        getRecords();
         res.render("chart", { fitnessRecords: records });
     }
     else {
@@ -84,38 +84,66 @@ app.post('/results', function (req, res) {
     });
     res.redirect('/');
 });
-app.post('/registering', async function (req, res) {
-    var date = new Date();
-    var encryptedPW = passwordHash.generate(`${req.body.password}`);
-    var sqlReq = `INSERT INTO ftusers (username, password, created_at, updated_at)
-    VALUES ('${req.body.username}', '${encryptedPW}', 
-    '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}',
-    '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}')`;
-    con.query(sqlReq, function (err, result) {
-        if (err) {
-            throw err;
+async function matchUsername(username) {
+    try {
+        var userObjStr = JSON.stringify(await getResult(username).catch(err => { console.log(err); }));
+        var userObjArr = userObjStr.split('"');
+        return userObjArr[5];
+    }
+    catch (err) {
+        console.log('This is supposed to happen because the name is unique.');
+    }
+}
+app.post('/registering', body('username').isLength({ min: 4 }), body('password').isLength({ min: 5 }), async function (req, res) {
+    // var errors = validationResult(req);  https://express-validator.github.io/docs/ 
+    // if (!errors.isEmpty()) {
+    //     return res.status(400).json({ errors: errors.array() });
+    // }
+    try {
+        if (await matchUsername(req.body.username) == req.body.username) {
+            console.log('Username already exists');
+            res.redirect('/login');
+            return;
         }
-        ;
-        console.log(`${req.body.username} has been welcomed to the site`);
-    });
-    var loggedUser = await getResult(req.body.username);
-    req.session.loggedIn = true;
-    req.session.user = loggedUser[0].id.toString();
-    res.redirect('/');
+        var date = new Date();
+        var encryptedPW = passwordHash.generate(`${req.body.password}`);
+        var sqlReq = `INSERT INTO ftusers (username, password, created_at, updated_at)
+        VALUES ('${req.body.username}', '${encryptedPW}', 
+        '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}',
+        '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}')`;
+        con.query(sqlReq, function (err, result) {
+            if (err) {
+                throw err;
+            }
+            ;
+            console.log(`${req.body.username} has been welcomed to the site`);
+        });
+        var loggedUser = await getResult(req.body.username);
+        req.session.loggedIn = true;
+        req.session.user = loggedUser[0].id.toString();
+        res.redirect('/');
+    }
+    catch (err) {
+        console.log(err);
+        Promise.reject(new Error('newName var not working'));
+        throw err;
+    }
 });
 function dbQuery(databaseQuery) {
     return new Promise(data => {
         con.query(databaseQuery, function (err, result) {
             if (err) {
                 console.log(err);
-                throw err;
+                return;
             }
             try {
                 console.log(result);
                 data(result);
             }
             catch (err) {
-                throw err;
+                Promise.reject('could not get data');
+                console.log(err);
+                return;
             }
         });
     });
@@ -125,11 +153,17 @@ async function getResult(username) {
         return await dbQuery(`SELECT * FROM ftusers WHERE username = '${username}' LIMIT 1`);
     }
     catch (err) {
-        throw (err);
+        console.log(err);
+        return;
     }
 }
 app.post('/loggingIn', async function (req, res) {
     try {
+        if (await matchUsername(req.body.username) != req.body.username) {
+            console.log('Username not found, please create an account.');
+            res.redirect('/login');
+            return;
+        }
         var loggedUser = await getResult(req.body.username);
         if (passwordHash.verify(req.body.password, loggedUser[0].password)) {
             console.log(`${req.body.username} logged in`);

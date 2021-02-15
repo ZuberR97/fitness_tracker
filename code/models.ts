@@ -6,6 +6,7 @@ export class fitRec {
     public pushups: number;
     public plank_seconds: number;
     public userid: number;
+    // users choose their own exercises and they are stored in an array. there is a separate array filled with numbers corresponding to the index of the exercise.
 
     constructor(id: number, created_at: Date, walking_minutes: number, pushups: number, plank_seconds: number, userid: number) {
         this.id = id;
@@ -16,12 +17,11 @@ export class fitRec {
         this.userid = userid;
     }
 }
-//add validations: https://www.npmjs.com/package/node-input-validator   https://express-validator.github.io/docs/
 
 export class ftuser {
     public id: number;
-    public username: string; //username will need to be unique
-    public password: string; //password needs to be hashed
+    public username: string;
+    public password: string;
     public created_at: Date;
     public updated_at: Date;
     public fitrecs: fitRec[];

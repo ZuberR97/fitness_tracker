@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ftuser = exports.fitRec = void 0;
 class fitRec {
+    // users choose their own exercises and they are stored in an array. there is a separate array filled with numbers corresponding to the index of the exercise.
     constructor(id, created_at, walking_minutes, pushups, plank_seconds, userid) {
         this.id = id;
         this.created_at = created_at;
@@ -12,7 +13,6 @@ class fitRec {
     }
 }
 exports.fitRec = fitRec;
-//add validations: https://www.npmjs.com/package/node-input-validator   https://express-validator.github.io/docs/
 class ftuser {
     constructor(id, username, password, created_at, updated_at) {
         this.id = id;

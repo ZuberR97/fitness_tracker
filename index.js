@@ -71,7 +71,7 @@ app.post('/logout', function (req, res) {
     req.session.user = '';
     res.redirect('/login');
 });
-app.post('/results', function (req, res) {
+app.post('/results', body('walking_minutes'), body('pushups'), body('plank_seconds'), function (req, res) {
     var date = new Date();
     var sqlReq = `INSERT INTO fitnesstracker (created_at, walking_minutes, pushups, plank_seconds) 
         VALUES ('${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
@@ -94,12 +94,13 @@ async function matchUsername(username) {
         console.log('This is supposed to happen because the name is unique.');
     }
 }
-app.post('/registering', body('username').isLength({ min: 4 }), body('password').isLength({ min: 5 }), async function (req, res) {
-    // var errors = validationResult(req);  https://express-validator.github.io/docs/ 
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() });
-    // }
+app.post('/registering', body('username').isLength({ min: 4, max: 20 }).withMessage('Username must be between 4 and 20 characters long.')
+    .isAlphanumeric().withMessage('Username must be alphanumeric.'), body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long.'), async function (req, res) {
     try {
+        var errors = validationResult(req); //https://express-validator.github.io/docs/ 
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         if (await matchUsername(req.body.username) == req.body.username) {
             console.log('Username already exists');
             res.redirect('/login');

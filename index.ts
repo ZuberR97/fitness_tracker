@@ -10,7 +10,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 // import * as ExpressSession from 'express-session';
 import { MemoryStore, Store } from 'express-session';
 import { request } from 'http';
-import {fitRec, ftuser} from './code/models';
+import {fitRec, ftuser, exercise} from './code/models';
 const app = express()
 const port = 3000
 const sql = require("mysql");
@@ -92,11 +92,11 @@ app.post('/logout', function(req: Request, res: Response) {
     res.redirect('/login');
 })
 
-app.post('/results', body('walking_minutes'), body('pushups'), body('plank_seconds'), function(req: Request, res: Response) {
+app.post('/results', function(req: Request, res: Response) {
     var date = new Date();
-    var sqlReq = `INSERT INTO fitnesstracker (created_at, walking_minutes, pushups, plank_seconds) 
+    var sqlReq = `INSERT INTO fitnesstracker (created_at, exercises, exerciseStats) 
         VALUES ('${date.getFullYear()}-${date.getUTCMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
-        '${req.body.walking_minutes}', '${req.body.pushups}', '${req.body.plank_seconds}')`;
+        '${req.body.exercises}', '${req.body.exerciseStats}')`;
     con.query(sqlReq, function (err: Error, result: any) {
         if(err) {throw err}
         console.log("New workout added");

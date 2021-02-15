@@ -16,15 +16,25 @@
                 <button class="buttonDiv">Logout</button>
             </form>
         </div>
-        
-        <form action="/results" method="POST">
-            <p>Walking minutes: </p>
-            <input type="number" name="walking_minutes">
-            <p>Pushups: </p>
-            <input type="number" name="pushups">
-            <p>Plank seconds: </p>
-            <input type="number" name="plank_seconds">
-            <input type="submit">
-        </form>
+        <div>
+            <h4>Today's Workout</h4>
+            <form action="/results" method="POST">
+                <p>Walking minutes: </p>
+                <input type="number" name="walking_minutes">
+                <p>Pushups: </p>
+                <input type="number" name="pushups">
+                <p>Plank seconds: </p>
+                <input type="number" name="plank_seconds">
+                <input type="submit">
+            </form>
+        </div>
+        <div>
+            <h4>Add a New Exercise to Your Workout</h4>
+            <form action="/new_exercise" method="POST">
+                <p>Exercise name: </p>
+                <input type="text" name="name">
+                <input type="submit">
+            </form>
+        </div>
     </body>
 </html>

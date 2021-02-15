@@ -3,12 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ftuser = exports.fitRec = void 0;
 class fitRec {
     // users choose their own exercises and they are stored in an array. there is a separate array filled with numbers corresponding to the index of the exercise.
-    constructor(id, created_at, walking_minutes, pushups, plank_seconds, userid) {
+    constructor(id, exercises, exerciseStats, created_at, userid) {
         this.id = id;
         this.created_at = created_at;
-        this.walking_minutes = walking_minutes;
-        this.pushups = pushups;
-        this.plank_seconds = plank_seconds;
+        this.exercises = exercises;
+        this.exerciseStats = exerciseStats;
         this.userid = userid;
     }
 }

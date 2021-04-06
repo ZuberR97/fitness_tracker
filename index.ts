@@ -44,6 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/static"));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.use(express.static(__dirname + '/views'));
 
 function getRecords() {
     con.query(`select * from fitnesstracker`, function (err: Error, recordset: any) {
@@ -61,6 +62,10 @@ app.get('/', function(req: Request, res: Response) {
         res.redirect("/login");
     }
 });
+
+app.get('/test', function(req: Request, res: Response) {
+    res.sendFile("test.html", {root: "./views"});
+})
 
 app.get('/table', function(req: Request, res: Response) {
     if(req.session.loggedIn) {

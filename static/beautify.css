@@ -27,7 +27,6 @@ button {
 table {
     border-collapse: collapse;
     border: solid 2px black;
-    /* margin-top: 30px; */
     margin: auto;
 }
 
@@ -41,10 +40,30 @@ th, td {
 
 .buttonDiv {
     text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    color: darkgreen;
+    text-decoration: none;
+}
+
+.buttonDiv a {
+    color: darkgreen;
+    text-decoration: none;
 }
 
 .chartDiv {
     width: 1200px;
     height: 700px;
     margin: auto;
+}
+
+.logRegBox {
+    display: inline-block;
+    margin: auto;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.logRegOverbox {
+    text-align: center;
 }

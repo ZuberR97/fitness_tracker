@@ -17,6 +17,7 @@
             </form>
         </div>
         
+        <h4>Create New Workout</h4>
         <form action="/results" method="POST">
             <p>Walking minutes: </p>
             <input type="number" name="walking_minutes">
@@ -24,6 +25,13 @@
             <input type="number" name="pushups">
             <p>Plank seconds: </p>
             <input type="number" name="plank_seconds">
+            <input type="submit">
+        </form>
+
+        <h4>Add New Exercise</h4>
+        <form action="/new_exercise" method="POST">
+            <p>Name of exercise: </p>
+            <input type="text" name="name">
             <input type="submit">
         </form>
         <div id="like_button_container" style="width: 100px; height: 100px;"></div>

@@ -16,7 +16,7 @@ var con = sql.createConnection({
     host: "localhost",
     user: "root",
     password: "root",
-    database: "mydb"
+    database: "fitness_tracker"
 });
 app.use(express.json());
 app.use(cookieParser());
@@ -31,7 +31,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
 function getRecords() {
-    con.query(`select * from fitnesstracker`, function (err, recordset) {
+    con.query(`select * from fitrecords`, function (err, recordset) {
         if (err)
             console.log(err);
         records = recordset;
@@ -75,9 +75,24 @@ app.post('/logout', function (req, res) {
     req.session.user = '';
     res.redirect('/login');
 });
+app.post('/new_exercise', function (req, res) {
+    var date = new Date();
+    var sqlReq = `INSERT INTO fitrecords (name, created_at, updated_at, userid) 
+        VALUES ('${req.body.name}', 
+        '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
+        '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}',
+        '${req.session.user}')`;
+    con.query(sqlReq, function (err, result) {
+        if (err) {
+            throw err;
+        }
+        console.log("New workout added");
+    });
+    res.redirect('/');
+});
 app.post('/results', body('walking_minutes'), body('pushups'), body('plank_seconds'), function (req, res) {
     var date = new Date();
-    var sqlReq = `INSERT INTO fitnesstracker (created_at, walking_minutes, pushups, plank_seconds) 
+    var sqlReq = `INSERT INTO fitrecords (created_at, walking_minutes, pushups, plank_seconds) 
         VALUES ('${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
         '${req.body.walking_minutes}', '${req.body.pushups}', '${req.body.plank_seconds}')`;
     con.query(sqlReq, function (err, result) {

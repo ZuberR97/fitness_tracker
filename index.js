@@ -30,8 +30,8 @@ app.use(express.static(__dirname + "/static"));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
-function getRecords() {
-    con.query(`select * from fitrecords`, function (err, recordset) {
+function getRecords(userid) {
+    con.query(`select * from fitrecords where userid = ${userid}`, function (err, recordset) {
         if (err)
             console.log(err);
         records = recordset;
@@ -39,7 +39,7 @@ function getRecords() {
 }
 app.get('/', function (req, res) {
     if (req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("main", { fitnessRecords: records });
     }
     else {
@@ -51,7 +51,7 @@ app.get('/test', function (req, res) {
 });
 app.get('/table', function (req, res) {
     if (req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("table", { fitnessRecords: records });
     }
     else {
@@ -60,15 +60,15 @@ app.get('/table', function (req, res) {
 });
 app.get('/chart', function (req, res) {
     if (req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("chart", { fitnessRecords: records });
     }
     else {
-        res.redirect("/login");
+        res.redirect('/login');
     }
 });
 app.get('/login', function (req, res) {
-    res.render("login");
+    res.render('login');
 });
 app.post('/logout', function (req, res) {
     req.session.loggedIn = false;
@@ -86,22 +86,35 @@ app.post('/new_exercise', function (req, res) {
         if (err) {
             throw err;
         }
-        console.log("New workout added");
+        console.log("New exercise added");
     });
     res.redirect('/');
 });
-app.post('/results', body('walking_minutes'), body('pushups'), body('plank_seconds'), function (req, res) {
-    var date = new Date();
-    var sqlReq = `INSERT INTO fitrecords (created_at, walking_minutes, pushups, plank_seconds) 
-        VALUES ('${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
-        '${req.body.walking_minutes}', '${req.body.pushups}', '${req.body.plank_seconds}')`;
-    con.query(sqlReq, function (err, result) {
-        if (err) {
-            throw err;
+app.post('/results', /*body('walking_minutes'), body('pushups'), body('plank_seconds'),*/ function (req, res) {
+    if (req.session.loggedIn) {
+        var date = new Date();
+        getRecords(req.session.user);
+        // console.log(req.body.amount);
+        // console.log(`this is the fitrecid: ${req.body.fitrecid}`);
+        // console.log(`count is: ${req.body.count}`);
+        for (var i = 0; i < req.body.count; i++) {
+            var sqlReq = `INSERT INTO fitdatas (amount, created_at, updated_at, fitrecid) 
+                VALUES ('${req.body.amount[i]}', 
+                '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
+                '${date.getFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}',
+                '${req.body.fitrecid[i]}')`;
+            con.query(sqlReq, function (err, result) {
+                if (err) {
+                    throw err;
+                }
+                console.log("New data added");
+            });
         }
-        console.log("New workout added");
-    });
-    res.redirect('/');
+        res.redirect('/');
+    }
+    else {
+        res.redirect('login');
+    }
 });
 async function matchUsername(username) {
     try {

@@ -16,16 +16,24 @@
                 <button class="buttonDiv">Logout</button>
             </form>
         </div>
-        
+        <!-- make amount an array and push the number to the array each time that the loop comes back -->
         <h4>Create New Workout</h4>
         <form action="/results" method="POST">
-            <p>Walking minutes: </p>
-            <input type="number" name="walking_minutes">
-            <p>Pushups: </p>
-            <input type="number" name="pushups">
-            <p>Plank seconds: </p>
-            <input type="number" name="plank_seconds">
-            <input type="submit">
+            <% if(fitnessRecords.length == 0) { %>
+                <p>Add an exercise to create a workout.</p>
+            <% } %>
+            <% var count = 0; %>
+            <% var amounts = []; %>
+            <% if(fitnessRecords.length != 0) { %>
+                <% for(i in fitnessRecords) { %>
+                    <% count++ %>
+                    <p><%= fitnessRecords[i].name %>: </p>
+                    <input type="number" name="amount">
+                    <input type="hidden" name="fitrecid" value="<%= fitnessRecords[i].id %>">
+                <% } %>
+                <input type="hidden" name="count" value="<%= count %>">
+                <input type="submit">
+            <% } %>
         </form>
 
         <h4>Add New Exercise</h4>

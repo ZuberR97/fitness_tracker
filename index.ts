@@ -9,6 +9,7 @@ const uuid = require('crypto').randomBytes(48).toString('hex');
 import {Router, Request, Response, NextFunction} from 'express';
 // import * as ExpressSession from 'express-session';
 import { MemoryStore, Store } from 'express-session';
+import { readdir } from 'fs';
 import { request } from 'http';
 import {fitRec, ftuser} from './code/models';
 const app = express()
@@ -46,8 +47,8 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
 
-function getRecords() {
-    con.query(`select * from fitrecords`, function (err: Error, recordset: any) {
+function getRecords(userid?: string) {
+    con.query(`select * from fitrecords where userid = ${userid}`, function (err: Error, recordset: any) {
         if(err) console.log(err);
         records = recordset;
     });
@@ -55,7 +56,7 @@ function getRecords() {
 
 app.get('/', function(req: Request, res: Response) {
     if(req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("main", {fitnessRecords: records});
     }
     else {
@@ -65,11 +66,11 @@ app.get('/', function(req: Request, res: Response) {
 
 app.get('/test', function(req: Request, res: Response) {
     res.sendFile("test.html", {root: "./views"});
-})
+});
 
 app.get('/table', function(req: Request, res: Response) {
     if(req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("table", {fitnessRecords: records});
     }
     else {
@@ -79,16 +80,16 @@ app.get('/table', function(req: Request, res: Response) {
 
 app.get('/chart', function(req: Request, res: Response) {
     if(req.session.loggedIn) {
-        getRecords();
+        getRecords(req.session.user);
         res.render("chart", {fitnessRecords: records});
     }
     else {
-        res.redirect("/login");
+        res.redirect('/login');
     }
 });
 
 app.get('/login', function(req: Request, res: Response) {
-    res.render("login");
+    res.render('login');
 });
 
 app.post('/logout', function(req: Request, res: Response) {
@@ -106,21 +107,34 @@ app.post('/new_exercise', function(req: Request, res: Response) {
         '${req.session.user}')`;
     con.query(sqlReq, function (err: Error, result: any) {
         if(err) {throw err}
-        console.log("New workout added");
+        console.log("New exercise added");
     });
     res.redirect('/');
 });
 
-app.post('/results', body('walking_minutes'), body('pushups'), body('plank_seconds'), function(req: Request, res: Response) {
-    var date = new Date();
-    var sqlReq = `INSERT INTO fitrecords (created_at, walking_minutes, pushups, plank_seconds) 
-        VALUES ('${date.getFullYear()}-${date.getUTCMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
-        '${req.body.walking_minutes}', '${req.body.pushups}', '${req.body.plank_seconds}')`;
-    con.query(sqlReq, function (err: Error, result: any) {
-        if(err) {throw err}
-        console.log("New workout added");
-    });
-    res.redirect('/');
+app.post('/results', /*body('walking_minutes'), body('pushups'), body('plank_seconds'),*/ function(req: Request, res: Response) {
+    if(req.session.loggedIn) {
+        var date = new Date();
+        getRecords(req.session.user);
+        // console.log(req.body.amount);
+        // console.log(`this is the fitrecid: ${req.body.fitrecid}`);
+        // console.log(`count is: ${req.body.count}`);
+        for(var i = 0; i < req.body.count; i++) {
+            var sqlReq = `INSERT INTO fitdatas (amount, created_at, updated_at, fitrecid) 
+                VALUES ('${req.body.amount[i]}', 
+                '${date.getFullYear()}-${date.getUTCMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}', 
+                '${date.getFullYear()}-${date.getUTCMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}',
+                '${req.body.fitrecid[i]}')`;
+            con.query(sqlReq, function (err: Error, result: any) {
+                if(err) {throw err}
+                console.log("New data added");
+            });
+        }
+        res.redirect('/');
+    }
+    else {
+        res.redirect('login')
+    }
 });
 
 async function matchUsername(username: string) {
@@ -169,7 +183,7 @@ async function(req: Request, res: Response) {
         Promise.reject(new Error('newName var not working'));
         throw err;
     }
-})
+});
 
 function dbQuery(databaseQuery: string): Promise<ftuser[]> {
     return new Promise(data => {
@@ -223,7 +237,7 @@ app.post('/loggingIn', async function(req: Request, res: Response) {
     catch(err) {
         throw(err);
     }
-})
+});
 
 app.listen(port, function() {
     console.log(`Fitness tracker listening at http://localhost:${port}`)

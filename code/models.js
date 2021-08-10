@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ftuser = exports.fitRec = void 0;
+exports.ftuser = exports.fitRec = exports.fitData = void 0;
 class fitData {
     constructor(id, amount, created_at, updated_at, fitrecid) {
         this.id = id;
@@ -10,6 +10,7 @@ class fitData {
         this.fitrecid = fitrecid;
     }
 }
+exports.fitData = fitData;
 class fitRec {
     constructor(id, name, fdata, created_at, updated_at, userid) {
         this.id = id;

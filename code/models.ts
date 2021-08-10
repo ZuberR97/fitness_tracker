@@ -1,5 +1,5 @@
 
-class fitData {
+export class fitData {
     public id: number;
     public amount: number;
     public created_at: Date;

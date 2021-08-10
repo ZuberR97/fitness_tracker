@@ -11,7 +11,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import { MemoryStore, Store } from 'express-session';
 import { readdir } from 'fs';
 import { request } from 'http';
-import {fitRec, ftuser} from './code/models';
+import {fitRec, ftuser, fitData} from './code/models';
 const app = express()
 const port = 3000
 const sql = require("mysql");
@@ -21,10 +21,12 @@ declare module 'express-session' {
     interface SessionData {
         user: string;
         loggedIn: boolean;
+        allFitData: fitData[];
     }
 }
 
 var records: fitRec[] = [];
+var allFitData: fitData[] = [];
 
 var con = sql.createConnection({
     host: "localhost",
@@ -48,10 +50,29 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
 
 function getRecords(userid?: string) {
-    con.query(`select * from fitrecords where userid = ${userid}`, function (err: Error, recordset: any) {
+    con.query(`select * from fitrecords where userid = ${userid}`, function(err: Error, recordset: any) {
         if(err) console.log(err);
         records = recordset;
     });
+}
+
+async function getData(req: Request, res: Response) {
+    try {
+        getRecords(req.session.user);
+        var tempArray: fitData[] = [];
+        for(var i = 0; i < records.length; i++) {
+            await con.query(`select * from fitdatas where fitrecid = ${records[i].id.toString()}`, function(err: Error, dataset: any) {
+                if(err) console.log(err);
+                tempArray = tempArray.concat(dataset);
+                allFitData = tempArray;
+                // console.log(`session array: ${allFitData}`);
+                // console.log(`in query: ${tempArray}`);
+            });
+        }
+    }
+    catch(err) {
+        console.log(err);
+    }
 }
 
 app.get('/', function(req: Request, res: Response) {
@@ -68,10 +89,11 @@ app.get('/test', function(req: Request, res: Response) {
     res.sendFile("test.html", {root: "./views"});
 });
 
-app.get('/table', function(req: Request, res: Response) {
+app.get('/table', async function(req: Request, res: Response) {
     if(req.session.loggedIn) {
-        getRecords(req.session.user);
-        res.render("table", {fitnessRecords: records});
+        await getData(req, res);
+        // console.log(`session data after function: ${allFitData}`);
+        res.render("table", {fitnessRecords: allFitData});
     }
     else {
         res.redirect("/login");
@@ -193,7 +215,7 @@ function dbQuery(databaseQuery: string): Promise<ftuser[]> {
                 return;
             }
             try {
-                console.log(result);
+                // console.log(result);
                 data(result);
             } catch (err) {
                 Promise.reject('could not get data');

@@ -26,9 +26,7 @@
             <% for(i in fitnessRecords) { %>
                 <tr>
                     <td><%= fitnessRecords[i].created_at.toString().substring(0, 15) %></td>
-                    <td><%= fitnessRecords[i].walking_minutes %></td>
-                    <td><%= fitnessRecords[i].pushups %></td>
-                    <td><%= fitnessRecords[i].plank_seconds %></td>
+                    <td><%= fitnessRecords[i].amount %></td>
                 </tr>
             <% } %>
         </table>
